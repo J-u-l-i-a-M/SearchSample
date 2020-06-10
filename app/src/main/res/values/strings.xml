@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Поиск слов</string>
+    <string name="enter_text">Введите слово для поиска значений:</string>
+    <string name="make_search">Найти</string>
+    <string name="word_meanings">Список значений:</string>
+    <string name="word_description">Информация о слове</string>
+    <string name="empty_text">Очень грустно, но мы ничего не нашли :(</string>
+    <string name="ok">OK</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="open_error">Что-то пошло не так :(</string>
+</resources>
