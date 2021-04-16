@@ -1,8 +1,8 @@
 package com.example.searchsample.entity
 
 import android.os.Parcelable
-import com.example.searchsample.StringUtil
 import com.example.searchsample.network.entity.MeaningResponse
+import com.example.searchsample.util.convertToUrl
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -14,7 +14,7 @@ data class Meaning(
 ) : Parcelable {
     constructor(response: MeaningResponse) : this(
         response.id,
-        StringUtil.getTryUrl(response.previewUrl ?: ""),
+        (response.previewUrl ?: "").convertToUrl(),
         Translation(response.translation)
     )
 }

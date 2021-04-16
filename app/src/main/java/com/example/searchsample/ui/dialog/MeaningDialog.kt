@@ -1,72 +1,84 @@
 package com.example.searchsample.ui.dialog
 
+import android.app.Dialog
+import android.content.DialogInterface
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.ProgressBar
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import com.example.searchsample.R
+import com.example.searchsample.databinding.DialogMeaningBinding
 import com.example.searchsample.di.ApplicationLoader
-import com.example.searchsample.di.DaggerAppComponent
+import com.example.searchsample.di.application.DaggerAppComponent
 import com.example.searchsample.entity.MeaningFull
 import com.example.searchsample.presenters.MeaningPresenter
 import com.example.searchsample.ui.activity.SearchActivity
 import com.example.searchsample.util.loadTryUrl
-import com.example.searchsample.util.visibility
+import com.example.searchsample.views.BaseMoxyView
 import com.example.searchsample.views.WordView
-import kotlinx.android.synthetic.main.dialog_meaning.*
-import moxy.presenter.InjectPresenter
-import moxy.presenter.ProvidePresenter
+import moxy.MvpAppCompatDialogFragment
+import moxy.ktx.moxyPresenter
 import javax.inject.Inject
+import javax.inject.Provider
 
 
-class MeaningDialog : BaseDialog(), WordView {
+class MeaningDialog : MvpAppCompatDialogFragment(), BaseMoxyView, WordView {
 
-    override fun layoutResId() = R.layout.dialog_meaning
-
-    override fun positiveButton() = R.string.ok
-
-    override fun positiveClick() {
-        super.positiveClick()
-        dismiss()
-        dismissListener.invoke()
-    }
+    lateinit var binding: DialogMeaningBinding
 
     @Inject
-    lateinit var presenterLazy: dagger.Lazy<MeaningPresenter>
-
-    @InjectPresenter
-    lateinit var presenter: MeaningPresenter
-
-    @ProvidePresenter
-    fun provide(): MeaningPresenter = presenterLazy.get()
+    lateinit var presenterProvider: Provider<MeaningPresenter>
+    private val presenter by moxyPresenter { presenterProvider.get() }
 
     private val wordId: Int by lazy { arguments?.getInt(WORD_ID) ?: 0 }
 
-    override fun inject() {
+    var dismissListener: () -> Unit = {}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         DaggerAppComponent
             .builder()
-            .applicationModule(ApplicationLoader.instance.applicationModule)
+            .appModule(ApplicationLoader.instance.applicationModule)
             .build().inject(this)
+        super.onCreate(savedInstanceState)
     }
 
-    override fun initViews() {
-        super.initViews()
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        binding = DialogMeaningBinding.inflate(LayoutInflater.from(context))
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setView(binding.root)
+        builder.setPositiveButton(R.string.ok) { _, _ ->
+            dismiss()
+        }
+        return builder.create().apply { setCanceledOnTouchOutside(true) }
+    }
+
+    override fun onResume() {
+        super.onResume()
         presenter.loadWord(wordId)
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        dismissListener()
+    }
+
     override fun onDataLoaded(word: MeaningFull) {
-        error_text.visibility(false)
-        word_text.text = word.text
-        meaning_info.text = word.translation.note
-        meaning_text.text = word.translation.text
-        meaning_info.visibility(word.translation.note.isNotBlank())
-        image.loadTryUrl(word.previewUrl, object : WebChromeClient() {
+        binding.errorText.isVisible = false
+        binding.wordText.text = word.text
+        binding.meaningInfo.text = word.translation.note
+        binding.meaningText.text = word.translation.text
+        binding.meaningInfo.isVisible = word.translation.note.isNotBlank()
+        binding.image.loadTryUrl(word.previewUrl, object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, progress: Int) {
-                if (progress < 100 && progressBar.visibility == ProgressBar.GONE) {
-                    progressBar.visibility(true)
+                if (progress < 100 && binding.progressBar.visibility == ProgressBar.GONE) {
+                    binding.progressBar.isVisible = true
                 }
-                progressBar.progress = progress
+                binding.progressBar.progress = progress
                 if (progress == 100) {
-                    progressBar.visibility(false)
+                    binding.progressBar.isVisible = false
                 }
             }
         }
@@ -74,7 +86,7 @@ class MeaningDialog : BaseDialog(), WordView {
     }
 
     override fun onError(message: String) {
-        error_text.visibility(true)
+        binding.errorText.isVisible = true
         (activity as? SearchActivity)?.onError(message)
     }
 

@@ -8,14 +8,14 @@
     android:background="@color/gray"
     android:elevation="2dp"
     android:orientation="horizontal"
-    android:paddingLeft="16dp"
-    android:paddingTop="8dp"
-    android:paddingRight="16dp"
-    android:paddingBottom="8dp">
+    android:paddingLeft="@dimen/padding_double"
+    android:paddingTop="@dimen/padding"
+    android:paddingRight="@dimen/padding_double"
+    android:paddingBottom="@dimen/padding">
 
     <TextView
         android:id="@+id/meaning_text"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
@@ -25,7 +25,8 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_arrow">
+        app:srcCompat="@drawable/ic_arrow"
+        tools:ignore="ContentDescription">
 
     </ImageView>
 

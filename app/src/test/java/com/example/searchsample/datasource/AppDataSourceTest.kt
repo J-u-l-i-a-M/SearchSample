@@ -1,12 +1,12 @@
-package com.example.searchsample.datastore
+package com.example.searchsample.datasource
 
 import com.example.searchsample.entity.Word
 import org.junit.Test
 
 import org.junit.Assert.*
 
-class AppDataStoreTest {
-    private val dataStore = AppDataStore()
+class AppDataSourceTest {
+    private val dataStore = AppDataSource()
 
     @Test
     fun isSameSearch() {

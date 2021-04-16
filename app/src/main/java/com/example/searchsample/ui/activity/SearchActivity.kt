@@ -4,38 +4,33 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
-import com.example.searchsample.di.ApplicationLoader
-import com.example.searchsample.presenters.SearchPresenter
+import androidx.core.view.isVisible
 import com.example.searchsample.R
-import com.example.searchsample.di.DaggerAppComponent
+import com.example.searchsample.databinding.ActivitySearchBinding
+import com.example.searchsample.di.ApplicationLoader
+import com.example.searchsample.di.application.DaggerAppComponent
 import com.example.searchsample.entity.Word
+import com.example.searchsample.presenters.SearchPresenter
 import com.example.searchsample.ui.adapters.WordMeansAdapter
 import com.example.searchsample.ui.dialog.MeaningDialog
 import com.example.searchsample.util.hideKeyboard
-import com.example.searchsample.util.visibility
 import com.example.searchsample.views.SearchView
-import kotlinx.android.synthetic.main.activity_search.*
 import moxy.MvpAppCompatActivity
-import moxy.presenter.InjectPresenter
-import moxy.presenter.ProvidePresenter
+import moxy.ktx.moxyPresenter
 import javax.inject.Inject
+import javax.inject.Provider
 
 
 class SearchActivity : MvpAppCompatActivity(), SearchView {
 
     @Inject
-    lateinit var presenterLazy: dagger.Lazy<SearchPresenter>
-
-    @InjectPresenter
-    lateinit var presenter: SearchPresenter
-
-    @ProvidePresenter
-    fun provide(): SearchPresenter = presenterLazy.get()
+    lateinit var presenterProvider: Provider<SearchPresenter>
+    private val presenter by moxyPresenter { presenterProvider.get() }
 
     init {
         DaggerAppComponent
             .builder()
-            .applicationModule(ApplicationLoader.instance.applicationModule)
+            .appModule(ApplicationLoader.instance.applicationModule)
             .build().inject(this)
     }
 
@@ -47,17 +42,20 @@ class SearchActivity : MvpAppCompatActivity(), SearchView {
     }
     private var dialog: MeaningDialog? = null
 
+    lateinit var binding: ActivitySearchBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        make_search.setOnClickListener {
-            presenter.searchWord(search_word.text.toString())
+        binding.makeSearch.setOnClickListener {
+            presenter.searchWord(binding.searchWord.text.toString())
         }
-        recycler_view.adapter = adapter
-        search_word.addTextChangedListener(object : TextWatcher {
+        binding.recyclerView.adapter = adapter
+        binding.searchWord.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(editable: Editable?) {
-                make_search.isEnabled = editable.toString().isNotBlank()
+                binding.makeSearch.isEnabled = editable.toString().isNotBlank()
             }
 
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
@@ -69,18 +67,18 @@ class SearchActivity : MvpAppCompatActivity(), SearchView {
     }
 
     override fun onDataLoaded(words: List<Word>) {
-        search_word.hideKeyboard()
+        binding.searchWord.hideKeyboard()
         adapter.updateWords(words)
-        empty_text.visibility(words.isEmpty())
-        recycler_view.visibility(words.isNotEmpty())
+        binding.emptyText.isVisible = words.isEmpty()
+        binding.recyclerView.isVisible = words.isNotEmpty()
     }
 
     override fun onSearchLoaded(search: String) {
-        search_word.setText(search)
+        binding.searchWord.setText(search)
     }
 
     override fun showWaitDialog(show: Boolean) {
-        progressBar.visibility(show)
+        binding.progressBar.isVisible = show
     }
 
     override fun showMeaning(meaningId: Int) {

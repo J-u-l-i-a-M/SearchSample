@@ -1,9 +1,10 @@
 package com.example.searchsample.di
 
 import androidx.multidex.MultiDexApplication
+import com.example.searchsample.di.application.AppModule
 
 class ApplicationLoader : MultiDexApplication() {
-    val applicationModule by lazy { ApplicationModule() }
+    val applicationModule by lazy { AppModule() }
 
     init {
         instance = this

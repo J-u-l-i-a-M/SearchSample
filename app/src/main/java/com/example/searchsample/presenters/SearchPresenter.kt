@@ -1,6 +1,5 @@
 package com.example.searchsample.presenters
 
-import android.annotation.SuppressLint
 import com.example.searchsample.repository.AppRepository
 import com.example.searchsample.util.applySchedulersSingle
 import com.example.searchsample.util.setStartTerminateWatcher
@@ -13,17 +12,18 @@ class SearchPresenter @Inject constructor(
     private val repository: AppRepository
 ) : BaseMoxyPresenter<SearchView>() {
 
-    @SuppressLint("CheckResult")
     fun searchWord(word: String) {
-        repository.loadData(word)
-            .applySchedulersSingle()
-            .setStartTerminateWatcher(viewState::showWaitDialog)
-            .subscribe({
-                viewState.onDataLoaded(it)
-            }) {
-                it.printStackTrace()
-                viewState.onError("")
-            }
+        disposable.set(
+            repository.loadData(word)
+                .applySchedulersSingle()
+                .setStartTerminateWatcher(viewState::showWaitDialog)
+                .subscribe({
+                    viewState.onDataLoaded(it)
+                }) {
+                    it.printStackTrace()
+                    viewState.onError("")
+                }
+        )
     }
 
     fun showMeaning(meaningId: Int) {

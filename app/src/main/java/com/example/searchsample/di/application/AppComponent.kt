@@ -1,10 +1,13 @@
-package com.example.searchsample.di
+package com.example.searchsample.di.application
 
+import com.example.searchsample.di.network.NetworkModule
 import com.example.searchsample.ui.activity.SearchActivity
 import com.example.searchsample.ui.dialog.MeaningDialog
 import dagger.Component
+import javax.inject.Singleton
 
-@Component(modules = [ApplicationModule::class])
+@Singleton
+@Component(modules = [NetworkModule::class, AppModule::class])
 interface AppComponent {
     fun inject(activity: SearchActivity)
 

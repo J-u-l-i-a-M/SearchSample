@@ -1,7 +1,7 @@
 package com.example.searchsample.entity
 
-import com.example.searchsample.StringUtil
 import com.example.searchsample.network.entity.MeaningFullResponse
+import com.example.searchsample.util.convertToUrl
 
 // значение слово с дополнительным набором полей
 data class MeaningFull(
@@ -13,7 +13,7 @@ data class MeaningFull(
     constructor(response: MeaningFullResponse) : this(
         response.id,
         response.text ?: "",
-        StringUtil.getTryUrl(response.images?.firstOrNull()?.url ?: ""),
+        (response.images?.firstOrNull()?.url ?: "").convertToUrl(),
         Translation(response.translation)
     )
 }

@@ -1,8 +1,8 @@
-package com.example.searchsample.datastore
+package com.example.searchsample.datasource
 
 import com.example.searchsample.entity.Word
 
-data class AppDataStore(
+data class AppDataSource(
     private var lastSearch: String = "",
     private val lastWords: MutableList<Word> = mutableListOf()
 ) {

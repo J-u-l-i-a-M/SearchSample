@@ -7,11 +7,11 @@ import com.bignerdranch.expandablerecyclerview.ChildViewHolder
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter
 import com.bignerdranch.expandablerecyclerview.ParentViewHolder
 import com.example.searchsample.R
+import com.example.searchsample.databinding.ViewItemChildMeaningBinding
+import com.example.searchsample.databinding.ViewItemParentWordBinding
 import com.example.searchsample.entity.Meaning
 import com.example.searchsample.entity.Word
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.view_item_child_meaning.*
-import kotlinx.android.synthetic.main.view_item_parent_word.*
 
 class WordMeansAdapter(
     private val itemClick: (Meaning) -> Unit
@@ -39,7 +39,7 @@ class WordMeansAdapter(
         LayoutContainer {
 
         fun bind(wordText: String) {
-            word_text.text = wordText
+            ViewItemParentWordBinding.bind(containerView).wordText.text = wordText
         }
     }
 
@@ -47,7 +47,7 @@ class WordMeansAdapter(
         LayoutContainer {
         fun bind(meaning: Meaning) {
             itemView.setOnClickListener { itemClick.invoke(meaning) }
-            meaning_text.text = meaning.translation.text
+            ViewItemChildMeaningBinding.bind(containerView).meaningText.text = meaning.translation.text
         }
     }
 }
